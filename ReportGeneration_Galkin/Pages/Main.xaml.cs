@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ReportGeneration_Galkin.Classes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,47 @@ namespace ReportGeneration_Galkin.Pages
     /// </summary>
     public partial class Main : Page
     {
+        public List<GroupContext> AllGroups = GroupContext.AllGroups();
+        public List<StudentContext> AllStudents = StudentContext.AllStudents();
+        public List<WorkContext> AllWorks = WorkContext.AllWorks();
+        public List<EvaluationContext> AllEvaluations = EvaluationContext.AllEvaluations();
+        public List<DisciplineContext> AllDisciplines = DisciplineContext.AllDisciplines();
         public Main()
         {
             InitializeComponent();
+        }
+
+        public void CreateGroupUI()
+        {
+            foreach (var group in AllGroups) CBGroups.Items.Add(group.Name);
+            CBGroups.Items.Add("Выберите");
+            CBGroups.SelectedIndex = CBGroups.Items.Count - 1;
+        }
+
+        public void CreateStudents(List<StudentContext> AllStudents)
+        {
+            parent.Children.Clear();
+            foreach (var student in AllStudents) parent.Children.Add(new Items.Student(Student, this));
+        }
+
+        private void SelectGroup(object sender, SelectionChangedEventArgs e)
+        {
+            if (CBGroups.SelectedIndex != CBGroups.Items.Count - 1)
+            {
+                int IdGroup = AllGroups.Find(x => x.Name == CBGroups.SelectedItem).Id;
+                CreateStudents(AllStudents.FindAll(x => x.IdGroup == IdGroup));
+            }
+        }
+
+        private void SelectStudents(object sender, KeyEventArgs e)
+        {
+            List<StudentContext> SearchStudents = AllStudents;
+            if (CBGroups.SelectedIndex != CBGroups.Items.Count - 1)
+            {
+                int IdGroup = AllGroups.Find(x => x.Name == CBGroups.SelectedItem).Id;
+                SearchStudents = AllStudents.FindAll(x => x.IdGroup == IdGroup);
+            }
+            CreateStudents(SearchStudents.FindAll(x => $"{x.LastName} {x.FirstName}".Contains(TBFIO.Text)));
         }
     }
 }
