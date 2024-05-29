@@ -11,23 +11,27 @@ namespace ReportGeneration_Galkin.Classes
 {
     public class StudentContext : Student
     {
-        public StudentContext(int Id, string Firstname, string Lastname, int IdGroup, bool Expelled, DateTime DateExpelled) : base(Id, Firstname, Lastname, IdGroup, Expelled, DateExpelled) { }
+        public StudentContext(int id, string firstname, string lastname, int idGroup, bool expelled, DateTime? dateExpelled)
+            : base(id, firstname, lastname, idGroup, expelled, dateExpelled) { }
 
         public static List<StudentContext> AllStudents()
         {
             List<StudentContext> allStudents = new List<StudentContext>();
             MySqlConnection connection = Connection.OpenConnection();
-            MySqlDataReader Student = Connection.Query("Select * From `student` Order By `LastName`;", connection);
-            while (Student.Read())
+            MySqlDataReader reader = Connection.Query("Select * From `student` Order By `LastName`;", connection);
+
+            while (reader.Read())
             {
-                allStudents.Add(new StudentContext(
-                    Student.GetInt32(0),
-                    Student.GetString(1),
-                    Student.GetString(2),
-                    Student.GetInt32(3),
-                    Student.GetBoolean(4),
-                    Student.GetDateTime(5)));
+                int id = reader.GetInt32(0);
+                string firstname = reader.IsDBNull(1) ? null : reader.GetString(1);
+                string lastname = reader.IsDBNull(2) ? null : reader.GetString(2);
+                int idGroup = reader.IsDBNull(3) ? 0 : reader.GetInt32(3);
+                bool expelled = reader.IsDBNull(4) ? false : reader.GetBoolean(4);
+                DateTime? dateExpelled = reader.IsDBNull(5) ? (DateTime?)null : reader.GetDateTime(5);
+
+                allStudents.Add(new StudentContext(id, firstname, lastname, idGroup, expelled, dateExpelled));
             }
+
             Connection.CloseConnection(connection);
             return allStudents;
         }

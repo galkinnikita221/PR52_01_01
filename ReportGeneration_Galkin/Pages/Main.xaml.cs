@@ -1,4 +1,6 @@
-﻿using ReportGeneration_Galkin.Classes;
+﻿using Org.BouncyCastle.Asn1.X509;
+using ReportGeneration_Galkin.Classes;
+using ReportGeneration_Galkin.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +31,8 @@ namespace ReportGeneration_Galkin.Pages
         public Main()
         {
             InitializeComponent();
+            CreateGroupUI();
+            CreateStudents(AllStudents);
         }
 
         public void CreateGroupUI()
@@ -41,7 +45,7 @@ namespace ReportGeneration_Galkin.Pages
         public void CreateStudents(List<StudentContext> AllStudents)
         {
             parent.Children.Clear();
-            foreach (var student in AllStudents) parent.Children.Add(new Items.Student(Student, this));
+            foreach (StudentContext Student in AllStudents) parent.Children.Add(new Items.Student(Student, this));
         }
 
         private void SelectGroup(object sender, SelectionChangedEventArgs e)
@@ -62,6 +66,15 @@ namespace ReportGeneration_Galkin.Pages
                 SearchStudents = AllStudents.FindAll(x => x.IdGroup == IdGroup);
             }
             CreateStudents(SearchStudents.FindAll(x => $"{x.LastName} {x.FirstName}".Contains(TBFIO.Text)));
+        }
+
+        private void ReportGeneration(object sender, RoutedEventArgs e)
+        {
+            if (CBGroups.SelectedIndex != CBGroups.Items.Count -1)
+            {
+                int IdGroup = AllGroups.Find(x => x.Name == CBGroups.SelectedItem).Id;
+                Classes.Common.Report.Group(IdGroup, this);
+            }
         }
     }
 }

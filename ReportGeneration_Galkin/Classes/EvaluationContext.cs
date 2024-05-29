@@ -17,7 +17,7 @@ namespace ReportGeneration_Galkin.Classes
         {
             List<EvaluationContext> allEvaluations = new List<EvaluationContext>();
             MySqlConnection connection = Connection.OpenConnection();
-            MySqlDataReader Evaluation = Connection.Query("Select * From `evaluation` Order By `evaluation`;", connection);
+            MySqlDataReader Evaluation = Connection.Query("Select * From `Evaluation` Order By `Id`;", connection);
             while (Evaluation.Read())
             {
                 allEvaluations.Add(new EvaluationContext(
